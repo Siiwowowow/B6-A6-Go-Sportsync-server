@@ -1,7 +1,8 @@
 package booking
 
 import (
-	"gotickets/internal/domain/booking/dto"
+	"gotickets/internal/domin/booking/dto"
+
 	"gorm.io/gorm"
 )
 

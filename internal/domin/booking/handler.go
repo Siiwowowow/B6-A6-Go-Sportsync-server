@@ -25,41 +25,41 @@ func getCurrentUserID(c *echo.Context) (uint, bool) {
 
 func bookingErrorResponse(c *echo.Context, err error) error {
 	if errors.Is(err, ErrBookingNotFound) {
-		return c.JSON(http.StatusNotFound, httpresponse.Error{
+		return c.JSON(http.StatusNotFound, httpResponse.Error{
 			Code:    http.StatusNotFound,
 			Message: "Booking not found",
 		})
 	}
 
 	if errors.Is(err, event.ErrEventNotFound) {
-		return c.JSON(http.StatusNotFound, httpresponse.Error{
+		return c.JSON(http.StatusNotFound, httpResponse.Error{
 			Code:    http.StatusNotFound,
 			Message: "Event not found",
 		})
 	}
 
 	if errors.Is(err, ErrNotEnoughTickets) {
-		return c.JSON(http.StatusConflict, httpresponse.Error{
+		return c.JSON(http.StatusConflict, httpResponse.Error{
 			Code:    http.StatusConflict,
 			Message: "Not enough tickets available",
 		})
 	}
 
 	if errors.Is(err, ErrBookingAlreadyCancelled) {
-		return c.JSON(http.StatusConflict, httpresponse.Error{
+		return c.JSON(http.StatusConflict, httpResponse.Error{
 			Code:    http.StatusConflict,
 			Message: "Booking is already cancelled",
 		})
 	}
 
 	if errors.Is(err, ErrForbiddenBookingAccess) {
-		return c.JSON(http.StatusForbidden, httpresponse.Error{
+		return c.JSON(http.StatusForbidden, httpResponse.Error{
 			Code:    http.StatusForbidden,
 			Message: "You do not own this booking",
 		})
 	}
 
-	return c.JSON(http.StatusInternalServerError, httpresponse.Error{
+	return c.JSON(http.StatusInternalServerError, httpResponse.Error{
 		Code:    http.StatusInternalServerError,
 		Message: "Something went wrong",
 		Details: err.Error(),
@@ -69,7 +69,7 @@ func bookingErrorResponse(c *echo.Context, err error) error {
 func (h *handler) CreateBooking(c *echo.Context) error {
 	userId, ok := getCurrentUserID(c)
 	if !ok {
-		return c.JSON(http.StatusUnauthorized, httpresponse.Error{
+		return c.JSON(http.StatusUnauthorized, httpResponse.Error{
 			Code:    http.StatusUnauthorized,
 			Message: "Unauthorized",
 		})
@@ -77,7 +77,7 @@ func (h *handler) CreateBooking(c *echo.Context) error {
 
 	var req dto.CreateRequest
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, httpresponse.Error{
+		return c.JSON(http.StatusBadRequest, httpResponse.Error{
 			Code:    http.StatusBadRequest,
 			Message: "Invalid request payload",
 			Details: err.Error(),
@@ -85,7 +85,7 @@ func (h *handler) CreateBooking(c *echo.Context) error {
 	}
 
 	if err := c.Validate(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, httpresponse.Error{
+		return c.JSON(http.StatusBadRequest, httpResponse.Error{
 			Code:    http.StatusBadRequest,
 			Message: "Validation failed",
 			Details: err.Error(),
