@@ -3,7 +3,7 @@ package user
 
 import (
 	"fmt"
-	"gotickets/internal/user/dto"
+	"gotickets/internal/domin/user/dto"
 	"gotickets/internal/auth"
 )
 
