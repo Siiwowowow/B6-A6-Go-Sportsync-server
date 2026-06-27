@@ -11,6 +11,8 @@ import (
 	"gorm.io/gorm/logger"
 )
 
+// ConnectDB establishes a connection to the PostgreSQL database using GORM.
+// It also configures a custom logger with a 3-second slow query threshold.
 func ConnectDB(cfg *Config) *gorm.DB {
 	dsn := cfg.Dsn
 
