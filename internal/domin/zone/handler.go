@@ -107,3 +107,89 @@ func (h *Handler) GetZoneByID(c *echo.Context) error {
 		"data":    response,
 	})
 }
+
+// UpdateZone handles PUT /api/v1/zones/:id (Admin Only)
+func (h *Handler) UpdateZone(c *echo.Context) error {
+	idStr := c.Param("id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]any{
+			"success": false,
+			"message": "Invalid zone ID format",
+			"errors":  "ID must be a valid UUID",
+		})
+	}
+
+	var req dto.CreateRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]any{
+			"success": false,
+			"message": "Invalid request payload",
+			"errors":  err.Error(),
+		})
+	}
+
+	if err := c.Validate(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]any{
+			"success": false,
+			"message": "Validation failed",
+			"errors":  err.Error(),
+		})
+	}
+
+	response, err := h.service.UpdateZone(id, req)
+	if err != nil {
+		if errors.Is(err, ErrZoneNotFound) {
+			return c.JSON(http.StatusNotFound, map[string]any{
+				"success": false,
+				"message": "Parking zone not found",
+				"errors":  err.Error(),
+			})
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]any{
+			"success": false,
+			"message": "Failed to update parking zone",
+			"errors":  err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]any{
+		"success": true,
+		"message": "Parking zone updated successfully",
+		"data":    response,
+	})
+}
+
+// DeleteZone handles DELETE /api/v1/zones/:id (Admin Only)
+func (h *Handler) DeleteZone(c *echo.Context) error {
+	idStr := c.Param("id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]any{
+			"success": false,
+			"message": "Invalid zone ID format",
+			"errors":  "ID must be a valid UUID",
+		})
+	}
+
+	err = h.service.DeleteZone(id)
+	if err != nil {
+		if errors.Is(err, ErrZoneNotFound) {
+			return c.JSON(http.StatusNotFound, map[string]any{
+				"success": false,
+				"message": "Parking zone not found",
+				"errors":  err.Error(),
+			})
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]any{
+			"success": false,
+			"message": "Failed to delete parking zone",
+			"errors":  err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]any{
+		"success": true,
+		"message": "Parking zone deleted successfully",
+	})
+}
