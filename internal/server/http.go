@@ -3,10 +3,14 @@ package server
 
 import (
 	"fmt"
+	"gotickets/internal/auth"
 	"gotickets/internal/config"
+	"gotickets/internal/domin/reservation"
 	"gotickets/internal/domin/user"
+	"gotickets/internal/domin/zone"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v5"
@@ -26,7 +30,11 @@ func (cv *CustomValidator) Validate(i any) error {
 }
 
 func Start(db *gorm.DB, cfg *config.Config) {
+	// Auto migrate database tables
 	db.AutoMigrate(&user.User{})
+	db.AutoMigrate(&zone.ParkingZone{})
+	db.AutoMigrate(&reservation.Reservation{})
+
 	e := echo.New()
 	e.Validator = &CustomValidator{validator: validator.New()}
 	e.Use(middleware.RequestLogger())
@@ -35,7 +43,13 @@ func Start(db *gorm.DB, cfg *config.Config) {
 		return c.String(http.StatusOK, "Hello,Go World!")
 	})
 
+	// Instantiate shared JWT service for route validation
+	jwtService := auth.NewJWTService(cfg.JwtSecret, 24*time.Hour)
+
 	user.RegisterRoutes(e, db, cfg)
+	zone.RegisterRoutes(e, db, jwtService)
+	reservation.RegisterRoutes(e, db, jwtService)
+
 	port := fmt.Sprintf(":%s", config.LoadEnv().Port)
 	serverURL := fmt.Sprintf("http://localhost:%s", config.LoadEnv().Port)
 	fmt.Println("\n" + strings.Repeat("=", 50))
