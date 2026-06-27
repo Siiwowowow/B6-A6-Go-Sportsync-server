@@ -8,12 +8,14 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// Config holds system environment variables
 type Config struct {
 	Port      string
 	Dsn       string
 	JwtSecret string
 }
 
+// LoadEnv reads properties from .env and maps them to Config
 func LoadEnv() *Config {
 	err := godotenv.Load()
 	if err != nil {
