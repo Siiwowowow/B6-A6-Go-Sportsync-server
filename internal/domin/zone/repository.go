@@ -18,6 +18,8 @@ type Repository interface {
 	FindAll() ([]*ParkingZone, error)
 	GetActiveReservationsCount(zoneID uuid.UUID) (int, error)
 	GetActiveReservationsCounts() (map[uuid.UUID]int, error)
+	Update(zone *ParkingZone) error
+	Delete(id uuid.UUID) error
 }
 
 type repository struct {
@@ -83,4 +85,19 @@ func (r *repository) GetActiveReservationsCounts() (map[uuid.UUID]int, error) {
 		counts[res.ZoneID] = res.Count
 	}
 	return counts, nil
+}
+
+func (r *repository) Update(zone *ParkingZone) error {
+	return r.db.Save(zone).Error
+}
+
+func (r *repository) Delete(id uuid.UUID) error {
+	result := r.db.Delete(&ParkingZone{}, id)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return ErrZoneNotFound
+	}
+	return nil
 }
