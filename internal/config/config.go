@@ -17,9 +17,8 @@ type Config struct {
 
 // LoadEnv reads properties from .env and maps them to Config
 func LoadEnv() *Config {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found, using system environment variables")
 	}
 
 	dsn := os.Getenv("DSN")
