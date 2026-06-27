@@ -1,0 +1,103 @@
+@baseUrl = http://localhost:5000
+
+### 1. Register User (Driver)
+POST {{baseUrl}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "name": "John Driver",
+  "email": "john@spotsync.com",
+  "password": "securePassword123",
+  "role": "driver"
+}
+
+### 2. Register Admin User
+POST {{baseUrl}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "name": "Jane Admin",
+  "email": "jane@spotsync.com",
+  "password": "securePassword123",
+  "role": "admin"
+}
+
+### 3. Login as Admin (To get token)
+# @name loginAdmin
+POST {{baseUrl}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "jane@spotsync.com",
+  "password": "securePassword123"
+}
+
+### 4. Create Parking Zone (Admin Only - Replace Bearer token with the token from Step 3)
+POST {{baseUrl}}/api/v1/zones
+Content-Type: application/json
+Authorization: Bearer <ADMIN_TOKEN_HERE>
+
+{
+  "name": "Terminal 1 EV Charging",
+  "type": "ev_charging",
+  "total_capacity": 20,
+  "price_per_hour": 5.50
+}
+
+### 5. Get All Zones (Public)
+GET {{baseUrl}}/api/v1/zones
+
+### 6. Get Single Zone (Public - Replace with actual zone UUID)
+GET {{baseUrl}}/api/v1/zones/<ZONE_UUID_HERE>
+
+### 7. Update Parking Zone (Admin Only - Replace Bearer token and UUID)
+PUT {{baseUrl}}/api/v1/zones/<ZONE_UUID_HERE>
+Content-Type: application/json
+Authorization: Bearer <ADMIN_TOKEN_HERE>
+
+{
+  "name": "Terminal 1 EV Charging (Updated)",
+  "type": "ev_charging",
+  "total_capacity": 25,
+  "price_per_hour": 6.50
+}
+
+### 8. Delete Parking Zone (Admin Only - Replace Bearer token and UUID)
+DELETE {{baseUrl}}/api/v1/zones/<ZONE_UUID_HERE>
+Authorization: Bearer <ADMIN_TOKEN_HERE>
+
+### 9. Login as Driver
+# @name loginDriver
+POST {{baseUrl}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "john@spotsync.com",
+  "password": "securePassword123"
+}
+
+### 10. Get Driver Profile (Protected - Replace Bearer token with token from Step 9)
+GET {{baseUrl}}/api/v1/auth/me
+Authorization: Bearer <DRIVER_TOKEN_HERE>
+
+### 11. Make a Reservation (Driver - Replace Bearer token and zone_id with actual UUID values)
+POST {{baseUrl}}/api/v1/reservations
+Content-Type: application/json
+Authorization: Bearer <DRIVER_TOKEN_HERE>
+
+{
+  "zone_id": "<ZONE_UUID_HERE>",
+  "license_plate": "ABC-1234"
+}
+
+### 12. Get My Reservations (Driver - Replace Bearer token)
+GET {{baseUrl}}/api/v1/reservations/my-reservations
+Authorization: Bearer <DRIVER_TOKEN_HERE>
+
+### 13. Cancel Reservation (Driver - Replace Bearer token and reservation UUID)
+DELETE {{baseUrl}}/api/v1/reservations/<RESERVATION_UUID_HERE>
+Authorization: Bearer <DRIVER_TOKEN_HERE>
+
+### 14. Get All Reservations (Admin Only - Replace Bearer token)
+GET {{baseUrl}}/api/v1/reservations
+Authorization: Bearer <ADMIN_TOKEN_HERE>
