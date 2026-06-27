@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// User represents the GORM schema and properties of a user in SpotSync.
 type User struct {
 	ID        uuid.UUID      `json:"id" gorm:"type:uuid;primaryKey"`
 	CreatedAt time.Time      `json:"created_at"`
