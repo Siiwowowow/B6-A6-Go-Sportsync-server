@@ -101,3 +101,44 @@ func (s *Service) GetAllZones() ([]*dto.Response, error) {
 
 	return responses, nil
 }
+
+func (s *Service) UpdateZone(id uuid.UUID, req dto.CreateRequest) (*dto.Response, error) {
+	zone, err := s.repo.FindByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	zone.Name = req.Name
+	zone.Type = req.Type
+	zone.TotalCapacity = req.TotalCapacity
+	zone.PricePerHour = req.PricePerHour
+
+	if err := s.repo.Update(zone); err != nil {
+		return nil, err
+	}
+
+	activeCount, err := s.repo.GetActiveReservationsCount(zone.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	availableSpots := zone.TotalCapacity - activeCount
+	if availableSpots < 0 {
+		availableSpots = 0
+	}
+
+	return &dto.Response{
+		ID:             zone.ID,
+		Name:           zone.Name,
+		Type:           zone.Type,
+		TotalCapacity:  zone.TotalCapacity,
+		AvailableSpots: availableSpots,
+		PricePerHour:   zone.PricePerHour,
+		CreatedAt:      zone.CreatedAt,
+		UpdatedAt:      zone.UpdatedAt,
+	}, nil
+}
+
+func (s *Service) DeleteZone(id uuid.UUID) error {
+	return s.repo.Delete(id)
+}
