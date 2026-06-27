@@ -18,9 +18,11 @@ func RegisterRoutes(e *echo.Echo, db *gorm.DB, jwtService auth.JWTService) {
 	e.GET("/api/v1/zones", handler.GetAllZones)
 	e.GET("/api/v1/zones/:id", handler.GetZoneByID)
 
-	// Admin-only route
+	// Admin-only routes
 	adminGroup := e.Group("/api/v1/zones")
 	adminGroup.Use(middleware.AuthMiddleware(jwtService))
 	adminGroup.Use(middleware.RoleMiddleware("admin"))
 	adminGroup.POST("", handler.CreateZone)
+	adminGroup.PUT("/:id", handler.UpdateZone)
+	adminGroup.DELETE("/:id", handler.DeleteZone)
 }
