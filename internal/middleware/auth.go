@@ -8,6 +8,7 @@ import (
 	"github.com/labstack/echo/v5"
 )
 
+// AuthMiddleware intercepts requests to parse and validate JWT bearer tokens.
 func AuthMiddleware(jwtService auth.JWTService) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c *echo.Context) error {
