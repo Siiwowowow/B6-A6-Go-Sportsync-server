@@ -14,6 +14,7 @@ const (
 	defaultTokenDuration = 24 * time.Hour
 )
 
+// JWTClaims defines the structured claims stored in the JWT payload
 type JWTClaims struct {
 	UserID uuid.UUID `json:"user_id"`
 	Name   string    `json:"name"`
